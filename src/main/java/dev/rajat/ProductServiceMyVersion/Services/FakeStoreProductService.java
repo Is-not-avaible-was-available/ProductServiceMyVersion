@@ -1,11 +1,10 @@
 package dev.rajat.ProductServiceMyVersion.Services;
 
-import dev.rajat.ProductServiceMyVersion.DTOs.FakeStoreProductDTO;
+import dev.rajat.ProductServiceMyVersion.ThirdPartyClient.FakeStore.dtos.FakeStoreProductDTO;
 import dev.rajat.ProductServiceMyVersion.DTOs.GenericProductDTO;
 import dev.rajat.ProductServiceMyVersion.Exceptions.NotFoundException;
 import dev.rajat.ProductServiceMyVersion.ThirdPartyClient.FakeStore.FakeStoreProductClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service("fakeStoreProductService")
-@Primary
 public class FakeStoreProductService implements ProductService{
     private FakeStoreProductClient fakeStoreProductClient;
     @Autowired
@@ -33,7 +31,7 @@ public class FakeStoreProductService implements ProductService{
         return genericProductDTO;
     }
     @Override
-    public GenericProductDTO getProductById(Long id) throws NotFoundException {
+    public GenericProductDTO getProductById(String id) throws NotFoundException {
         return fakeStoreDTOtoGenericProductDTO(fakeStoreProductClient.getProductById(id));
     }
 
@@ -54,12 +52,12 @@ public class FakeStoreProductService implements ProductService{
     }
 
     @Override
-    public GenericProductDTO deleteProductById(Long id) throws NotFoundException {
+    public GenericProductDTO deleteProductById(String id) throws NotFoundException {
         return fakeStoreDTOtoGenericProductDTO(fakeStoreProductClient.deleteProductById(id));
     }
 
     @Override
-    public GenericProductDTO updateProductById(Long id, GenericProductDTO updatedProductDTO) {
+    public GenericProductDTO updateProductById(String id, GenericProductDTO updatedProductDTO) {
         return fakeStoreDTOtoGenericProductDTO(fakeStoreProductClient.updateProductById(id, updatedProductDTO));
     }
 }

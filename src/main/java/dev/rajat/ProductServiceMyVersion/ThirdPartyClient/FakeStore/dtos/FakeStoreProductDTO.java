@@ -1,4 +1,4 @@
-package dev.rajat.ProductServiceMyVersion.DTOs;
+package dev.rajat.ProductServiceMyVersion.ThirdPartyClient.FakeStore.dtos;
 
 import lombok.Getter;
 import lombok.Setter;
