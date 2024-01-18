@@ -15,5 +15,5 @@ public interface ProductService{
     public List<GenericProductDTO> getAllProducts() throws NotFoundException;
     public GenericProductDTO createProduct(GenericProductDTO newProductDTO);
     public GenericProductDTO deleteProductById(String id) throws NotFoundException;
-    public GenericProductDTO updateProductById(String id, GenericProductDTO updatedProductDTO);
+    public GenericProductDTO updateProductById(String id, GenericProductDTO updatedProductDTO) throws NotFoundException;
 }

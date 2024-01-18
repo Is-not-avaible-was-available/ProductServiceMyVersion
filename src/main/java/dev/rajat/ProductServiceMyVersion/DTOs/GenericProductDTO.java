@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Getter
 @Setter
 public class GenericProductDTO {
-    private Long id;
+    private String id;
     private String title;
     private String description;
     private String image;

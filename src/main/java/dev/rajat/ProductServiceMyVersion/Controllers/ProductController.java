@@ -14,7 +14,7 @@ import java.util.List;
 public class ProductController {
     private ProductService productService;
     @Autowired
-    public ProductController(@Qualifier("fakeStoreProductService") ProductService productService){
+    public ProductController(@Qualifier("selfProductService") ProductService productService){
         this.productService = productService;
     }
 
@@ -37,7 +37,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public GenericProductDTO updateProduct(@PathVariable("id")String id, @RequestBody GenericProductDTO updatedProductDTO){
+    public GenericProductDTO updateProduct(@PathVariable("id")String id, @RequestBody GenericProductDTO updatedProductDTO) throws NotFoundException {
         return productService.updateProductById(id,updatedProductDTO);
     }
 
