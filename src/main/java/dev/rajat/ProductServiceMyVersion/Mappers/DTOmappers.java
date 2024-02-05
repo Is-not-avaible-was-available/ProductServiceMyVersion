@@ -9,6 +9,9 @@ import dev.rajat.ProductServiceMyVersion.Models.Product;
 public class DTOmappers {
 
     public static CategoryDTO categoryToCategoryDTO(Category category){
+        if(category==null){
+            return null;
+        }
         CategoryDTO categoryDTO = new CategoryDTO();
         categoryDTO.setId(category.getUuid().toString());
         categoryDTO.setName(category.getName());
@@ -16,6 +19,9 @@ public class DTOmappers {
     }
 
     public static GenericProductDTO productToGenericProductDto(Product product){
+        if(product == null){
+            return null;
+        }
         GenericProductDTO genericProductDTO = new GenericProductDTO();
         genericProductDTO.setId(product.getUuid().toString());
         genericProductDTO.setTitle(product.getTitle());

@@ -116,13 +116,10 @@ public class SelfProductService implements ProductService{
             }
         }
 
-        Double newPrice = updatedProduct.getPrice();
-        if(!newPrice.isNaN()){
             Price price = new Price();
             price.setPrice(updatedProduct.getPrice());
             price.setCurrency("Rupee");
             product.setPrice(price);
-        }
 
         Product newProduct = productRepository.save(product);
         return DTOmappers.productToGenericProductDto(newProduct);

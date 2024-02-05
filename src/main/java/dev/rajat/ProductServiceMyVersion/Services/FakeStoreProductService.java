@@ -19,6 +19,9 @@ public class FakeStoreProductService implements ProductService{
     }
 
     private GenericProductDTO fakeToGenericProductDTO(FakeStoreDTO fakeStoreDTO){
+        if(fakeStoreDTO == null){
+            return null;
+        }
         GenericProductDTO genericProductDTO= new GenericProductDTO();
         genericProductDTO.setId(fakeStoreDTO.getId());
         genericProductDTO.setTitle(fakeStoreDTO.getTitle());
@@ -30,7 +33,11 @@ public class FakeStoreProductService implements ProductService{
     }
     @Override
     public GenericProductDTO getProductById(String id) throws NotFoundException {
-        return fakeToGenericProductDTO(fakeStoreProductClient.getProductById(id));
+        GenericProductDTO genericProductDTO = fakeToGenericProductDTO(fakeStoreProductClient.getProductById(id));
+        if(genericProductDTO == null){
+            throw new NotFoundException("Not found " + id);
+        }
+        return genericProductDTO;
     }
 
     @Override
