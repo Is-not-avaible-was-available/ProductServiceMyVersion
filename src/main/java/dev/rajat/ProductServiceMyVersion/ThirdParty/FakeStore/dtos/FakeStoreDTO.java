@@ -1,15 +1,15 @@
-package dev.rajat.ProductServiceMyVersion.ThirdPartyClient.FakeStore.dtos;
+package dev.rajat.ProductServiceMyVersion.ThirdParty.FakeStore.dtos;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class FakeStoreProductDTO {
+public class FakeStoreDTO {
     private String id;
     private String title;
     private String description;
     private String image;
-    private double price;
     private String category;
+    private double price;
 }

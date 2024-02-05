@@ -2,8 +2,13 @@ package dev.rajat.ProductServiceMyVersion.Services;
 
 import dev.rajat.ProductServiceMyVersion.DTOs.GenericProductDTO;
 import dev.rajat.ProductServiceMyVersion.Exceptions.NotFoundException;
+import dev.rajat.ProductServiceMyVersion.Mappers.DTOmappers;
+import dev.rajat.ProductServiceMyVersion.Models.Category;
+import dev.rajat.ProductServiceMyVersion.Models.Price;
 import dev.rajat.ProductServiceMyVersion.Models.Product;
+import dev.rajat.ProductServiceMyVersion.Repositories.CategoryRepository;
 import dev.rajat.ProductServiceMyVersion.Repositories.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,82 +18,113 @@ import java.util.UUID;
 
 @Service("selfProductService")
 public class SelfProductService implements ProductService{
+
     private ProductRepository productRepository;
-    public SelfProductService(ProductRepository productRepository){
+    private CategoryRepository categoryRepository;
+    @Autowired
+    public SelfProductService(ProductRepository productRepository, CategoryRepository categoryRepository){
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
-    public GenericProductDTO productToGenericProductDTO(Product product){
-        GenericProductDTO genericProductDTO = new GenericProductDTO();
-        if(product.getUuid()!=null){
-            genericProductDTO.setId(product.getUuid().toString());
-        }
-        genericProductDTO.setCategory(product.getCategory().getName());
-        genericProductDTO.setDescription(product.getDescription());
-        genericProductDTO.setTitle(product.getTitle());
-        genericProductDTO.setImage(product.getImage());
-        genericProductDTO.setPrice(product.getPrice().getPrice());
-        return genericProductDTO;
-    }
 
-    public Product genericProductDTOtoProduct(GenericProductDTO genericProductDTO){
-        Product product = new Product();
-        product.setUuid(UUID.fromString(genericProductDTO.getId()));
-       product.setImage(genericProductDTO.getImage());
-       product.setDescription(genericProductDTO.getDescription());
-       product.setTitle(genericProductDTO.getTitle());
-       return product;
-    }
     @Override
-    public GenericProductDTO createProduct(GenericProductDTO newProductDTO) {
-
-        Product product = genericProductDTOtoProduct(newProductDTO);
-        Product savedProduct = productRepository.save(product);
-        return productToGenericProductDTO(savedProduct);
+    public GenericProductDTO getProductById(String id) throws NotFoundException {
+        Optional<Product> productOptional = productRepository.findById(UUID.fromString(id));
+        if(productOptional.isEmpty()){
+            throw new NotFoundException("product with id:"+id+", is not found!");
+        }
+        Product product = productOptional.get();
+        return DTOmappers.productToGenericProductDto(product);
     }
 
     @Override
     public List<GenericProductDTO> getAllProducts() throws NotFoundException {
         List<Product> products = productRepository.findAll();
-        List<GenericProductDTO>genericProductDTOS = new ArrayList<>();
-        for(Product product:products){
-            genericProductDTOS.add(productToGenericProductDTO(product));
+        List<GenericProductDTO> genericProductDTOS = new ArrayList<>();
+
+        for(Product product: products){
+            genericProductDTOS.add(DTOmappers.productToGenericProductDto(product));
         }
         return genericProductDTOS;
     }
 
     @Override
-    public GenericProductDTO getProductById(String id) throws NotFoundException {
-        Optional<Product>productOptional = productRepository.findById(UUID.fromString(id));
-        if(productOptional.isEmpty()){
-            throw new NotFoundException("product with id:"+id+", is not found!");
-        }
-        Product product = productOptional.get();
-        return productToGenericProductDTO(product);
-    }
+    public GenericProductDTO createProduct(GenericProductDTO genericProductDTO) {
+        Product product = new Product();
+        product.setTitle(genericProductDTO.getTitle());
+        product.setDescription(genericProductDTO.getDescription());
+        product.setImage(genericProductDTO.getImage());
 
-    @Override
-    public GenericProductDTO updateProductById(String id, GenericProductDTO updatedProductDTO) throws NotFoundException {
-        Optional<Product> productOptional = productRepository.findById(UUID.fromString(id));
-        if(productOptional.isEmpty()){
-            throw  new NotFoundException("product with id:"+id+", is not found!");
+        Optional<Category>optionalCategory = categoryRepository.findCategoryByName(genericProductDTO.getCategory());
+        if(optionalCategory.isEmpty()){
+            Category category = new Category();
+            category.setName(genericProductDTO.getCategory());
+            Category saved = categoryRepository.save(category);
+            product.setCategory(saved);
+        }else{
+            Category existingCategory = optionalCategory.get();
+            product.setCategory(existingCategory);
         }
-        Product product = productOptional.get();
-        product.setTitle(updatedProductDTO.getTitle());
-        product.setDescription(updatedProductDTO.getDescription());
-        product.setImage(updatedProductDTO.getImage());
-        return productToGenericProductDTO(product);
+        Price price = new Price();
+        price.setPrice(genericProductDTO.getPrice());
+        price.setCurrency("Rupee");
+        product.setPrice(price);
+        Product savedProduct = productRepository.save(product);
+        return DTOmappers.productToGenericProductDto(savedProduct);
     }
 
     @Override
     public GenericProductDTO deleteProductById(String id) throws NotFoundException {
+        Optional<Product> productOptional = productRepository.findById(UUID.fromString(id));
+        if(productOptional.isEmpty()){
+            throw new NotFoundException("Product with id:"+id+", is not found!");
+        }
+        productRepository.deleteById(UUID.fromString(id));
+        Product product = productOptional.get();
+        return DTOmappers.productToGenericProductDto(product);
+    }
+
+    @Override
+    public GenericProductDTO updateProductById(String id, GenericProductDTO updatedProduct) throws NotFoundException {
         Optional<Product> optionalProduct = productRepository.findById(UUID.fromString(id));
         if(optionalProduct.isEmpty()){
-            throw new NotFoundException("not found with id:"+id);
-        }else{
-            productRepository.deleteById(UUID.fromString(id));
+            throw new NotFoundException("Product with id:"+id+", is not found!");
         }
         Product product = optionalProduct.get();
-        return productToGenericProductDTO(product);
+        if(updatedProduct.getTitle()!=null){
+            product.setTitle(updatedProduct.getTitle());
+        }
+        if(updatedProduct.getImage()!=null){
+            product.setImage(updatedProduct.getImage());
+        }
+
+        if(updatedProduct.getDescription()!=null){
+            product.setDescription(updatedProduct.getDescription());
+        }
+
+        if(updatedProduct.getCategory()!=null){
+            Optional<Category>optionalCategory = categoryRepository
+                    .findCategoryByName(updatedProduct.getCategory());
+            if(optionalCategory.isEmpty()){
+                Category category = new Category();
+                category.setName(updatedProduct.getCategory());
+                Category saved = categoryRepository.save(category);
+                product.setCategory(saved);
+            }else{
+                product.setCategory(optionalCategory.get());
+            }
+        }
+
+        Double newPrice = updatedProduct.getPrice();
+        if(!newPrice.isNaN()){
+            Price price = new Price();
+            price.setPrice(updatedProduct.getPrice());
+            price.setCurrency("Rupee");
+            product.setPrice(price);
+        }
+
+        Product newProduct = productRepository.save(product);
+        return DTOmappers.productToGenericProductDto(newProduct);
     }
 }

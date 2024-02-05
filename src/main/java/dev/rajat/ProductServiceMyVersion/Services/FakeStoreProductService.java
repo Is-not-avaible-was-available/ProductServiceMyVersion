@@ -1,11 +1,10 @@
 package dev.rajat.ProductServiceMyVersion.Services;
 
-import dev.rajat.ProductServiceMyVersion.ThirdPartyClient.FakeStore.dtos.FakeStoreProductDTO;
+import dev.rajat.ProductServiceMyVersion.ThirdParty.FakeStore.dtos.FakeStoreDTO;
 import dev.rajat.ProductServiceMyVersion.DTOs.GenericProductDTO;
 import dev.rajat.ProductServiceMyVersion.Exceptions.NotFoundException;
-import dev.rajat.ProductServiceMyVersion.ThirdPartyClient.FakeStore.FakeStoreProductClient;
+import dev.rajat.ProductServiceMyVersion.ThirdParty.FakeStore.FakeStoreProductClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,45 +18,43 @@ public class FakeStoreProductService implements ProductService{
         this.fakeStoreProductClient = fakeStoreProductClient;
     }
 
-
-    public GenericProductDTO fakeStoreDTOtoGenericProductDTO(FakeStoreProductDTO fakeStoreProductDTO){
-        GenericProductDTO genericProductDTO = new GenericProductDTO();
-        genericProductDTO.setId(fakeStoreProductDTO.getId());
-        genericProductDTO.setTitle(fakeStoreProductDTO.getTitle());
-        genericProductDTO.setDescription(fakeStoreProductDTO.getDescription());
-        genericProductDTO.setImage(fakeStoreProductDTO.getImage());
-        genericProductDTO.setPrice(fakeStoreProductDTO.getPrice());
-        genericProductDTO.setCategory(fakeStoreProductDTO.getCategory());
+    private GenericProductDTO fakeToGenericProductDTO(FakeStoreDTO fakeStoreDTO){
+        GenericProductDTO genericProductDTO= new GenericProductDTO();
+        genericProductDTO.setId(fakeStoreDTO.getId());
+        genericProductDTO.setTitle(fakeStoreDTO.getTitle());
+        genericProductDTO.setImage(fakeStoreDTO.getImage());
+        genericProductDTO.setDescription(fakeStoreDTO.getDescription());
+        genericProductDTO.setPrice(fakeStoreDTO.getPrice());
+        genericProductDTO.setCategory(fakeStoreDTO.getCategory());
         return genericProductDTO;
     }
     @Override
     public GenericProductDTO getProductById(String id) throws NotFoundException {
-        return fakeStoreDTOtoGenericProductDTO(fakeStoreProductClient.getProductById(id));
+        return fakeToGenericProductDTO(fakeStoreProductClient.getProductById(id));
     }
 
     @Override
     public List<GenericProductDTO> getAllProducts() throws NotFoundException {
-        List<FakeStoreProductDTO> fakeStoreProductDTOS = fakeStoreProductClient.getAllProducts();
+        List<FakeStoreDTO> fakeStoreDTOS = fakeStoreProductClient.getAllProducts();
         List<GenericProductDTO> genericProductDTOS = new ArrayList<>();
-        for(FakeStoreProductDTO fakeStoreProductDTO: fakeStoreProductDTOS){
-            GenericProductDTO genericProductDTO = fakeStoreDTOtoGenericProductDTO(fakeStoreProductDTO);
-            genericProductDTOS.add(genericProductDTO);
+        for(FakeStoreDTO fakeStoreDTO: fakeStoreDTOS){
+            genericProductDTOS.add(fakeToGenericProductDTO(fakeStoreDTO));
         }
         return genericProductDTOS;
     }
 
     @Override
-    public GenericProductDTO createProduct(GenericProductDTO newProductDTO) {
-       return fakeStoreDTOtoGenericProductDTO(fakeStoreProductClient.createProduct(newProductDTO));
+    public GenericProductDTO createProduct(GenericProductDTO genericProductDTO) {
+        return fakeToGenericProductDTO(fakeStoreProductClient.createProduct(genericProductDTO));
     }
 
     @Override
     public GenericProductDTO deleteProductById(String id) throws NotFoundException {
-        return fakeStoreDTOtoGenericProductDTO(fakeStoreProductClient.deleteProductById(id));
+        return fakeToGenericProductDTO(fakeStoreProductClient.deleteProductById(id));
     }
 
     @Override
-    public GenericProductDTO updateProductById(String id, GenericProductDTO updatedProductDTO) {
-        return fakeStoreDTOtoGenericProductDTO(fakeStoreProductClient.updateProductById(id, updatedProductDTO));
+    public GenericProductDTO updateProductById(String id, GenericProductDTO updatedProduct) throws NotFoundException {
+        return fakeToGenericProductDTO(fakeStoreProductClient.updateProductById(id, updatedProduct));
     }
 }

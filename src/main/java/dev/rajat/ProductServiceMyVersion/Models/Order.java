@@ -1,11 +1,6 @@
 package dev.rajat.ProductServiceMyVersion.Models;
 
-import dev.rajat.ProductServiceMyVersion.Models.BaseModel;
-import dev.rajat.ProductServiceMyVersion.Models.Product;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,10 +9,12 @@ import java.util.List;
 @Getter
 @Setter
 @Entity(name = "orders")
-public class Order extends BaseModel {
+public class Order extends BaseModel{
     @ManyToMany
-    @JoinTable(name = "products_orders", joinColumns = @JoinColumn(name = "orderId"),
-    inverseJoinColumns = @JoinColumn(name = "productId")
+    @JoinTable(
+            name = "products_order",
+            joinColumns = @JoinColumn(name = "orderId"),
+            inverseJoinColumns = @JoinColumn(name = "productId")
     )
-    private List<Product> products;
+    private List<Product>products;
 }

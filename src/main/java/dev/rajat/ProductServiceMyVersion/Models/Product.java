@@ -6,15 +6,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
-
+@Entity(name = "products")
 public class Product extends BaseModel{
     private String title;
     private String description;
-    private String image;
-    @OneToOne(cascade ={CascadeType.REMOVE, CascadeType.PERSIST})
+    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private Price price;
     @ManyToOne
     @JoinColumn(name = "category")
     private Category category;
+    private String image;
 }

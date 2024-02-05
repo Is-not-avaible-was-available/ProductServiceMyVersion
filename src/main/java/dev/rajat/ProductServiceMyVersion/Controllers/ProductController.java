@@ -16,34 +16,26 @@ public class ProductController {
     @Autowired
     public ProductController(@Qualifier("selfProductService") ProductService productService){
         this.productService = productService;
-    }
-
+   }
     @GetMapping("/{id}")
     public GenericProductDTO getProductById(@PathVariable("id") String id) throws NotFoundException {
         return productService.getProductById(id);
     }
-
-
-
-    @GetMapping()
+    @GetMapping
     public List<GenericProductDTO> getAllProducts() throws NotFoundException {
         return productService.getAllProducts();
-
     }
-
-    @PostMapping()
+    @PostMapping
     public GenericProductDTO createProduct(@RequestBody GenericProductDTO genericProductDTO){
         return productService.createProduct(genericProductDTO);
     }
-
-    @PutMapping("/{id}")
-    public GenericProductDTO updateProduct(@PathVariable("id")String id, @RequestBody GenericProductDTO updatedProductDTO) throws NotFoundException {
-        return productService.updateProductById(id,updatedProductDTO);
-    }
-
     @DeleteMapping("/{id}")
-    public GenericProductDTO deleteProduct(@PathVariable("id") String id) throws NotFoundException {
+    public GenericProductDTO deleteProductById(@PathVariable("id") String id) throws NotFoundException {
         return productService.deleteProductById(id);
-
+    }
+    @PutMapping("/{id}")
+    public GenericProductDTO updateProductById(@PathVariable("id") String id,
+                                               @RequestBody GenericProductDTO updatedProduct) throws NotFoundException {
+        return productService.updateProductById(id, updatedProduct);
     }
 }

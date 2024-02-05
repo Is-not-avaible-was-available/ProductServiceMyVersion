@@ -1,37 +1,60 @@
 package dev.rajat.ProductServiceMyVersion.Controllers;
 
+import dev.rajat.ProductServiceMyVersion.DTOs.CategoryDTO;
+import dev.rajat.ProductServiceMyVersion.DTOs.GenericProductDTO;
+import dev.rajat.ProductServiceMyVersion.Exceptions.AlreadyExistsException;
 import dev.rajat.ProductServiceMyVersion.Exceptions.NotFoundException;
-import dev.rajat.ProductServiceMyVersion.Models.Category;
-import dev.rajat.ProductServiceMyVersion.Models.Product;
 import dev.rajat.ProductServiceMyVersion.Services.CategoryService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/categories")
-public class CategoryController {
+public class CategoryController{
+
     private CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService){
+    @Autowired
+    public CategoryController(@Qualifier("categoryService") CategoryService categoryService){
         this.categoryService = categoryService;
     }
 
-    @GetMapping("/{uuid}")
-    public Category getCategoryById(@PathVariable("uuid") String uuid) throws NotFoundException {
-        return categoryService.getCategoryById(uuid);
+    @GetMapping("{id}")
+    public CategoryDTO getCategoryById(@PathVariable("id") String id) throws NotFoundException {
+        return categoryService.getCategoryById(id);
     }
+
     @GetMapping
-    public List<Category> getAllCategory(){
+    public List<CategoryDTO> getAllCategories(){
         return categoryService.getAllCategories();
     }
 
+    @PostMapping
+    public CategoryDTO createCategory(@RequestBody CategoryDTO categoryDTO) throws AlreadyExistsException {
+        return categoryService.createCategory(categoryDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public CategoryDTO deleteCategoryById(@PathVariable("id") String id) throws NotFoundException {
+        return categoryService.deleteCategoryById(id);
+    }
+
+    @PutMapping("/{id}")
+    public CategoryDTO updateCategoryById(@PathVariable("id") String id,
+                                          @RequestBody CategoryDTO categoryDTO) throws NotFoundException {
+        return categoryService.updateCategoryById(id, categoryDTO);
+    }
+
+    @GetMapping("/products/{id}")
+    public List<GenericProductDTO> getAllProductByCategory(@PathVariable("id") String id) throws NotFoundException {
+        return categoryService.getAllProductsByCategory(id);
+    }
+
     @GetMapping("/products")
-    public List<Product> getProductBasedOnCategories(String categoryId) throws NotFoundException {
-        return categoryService.getProductBasedOnCategories(categoryId);
+    public List<GenericProductDTO> getAllProductsByCategories(@RequestBody List<String> categoriesId){
+        return categoryService.getAllProductsByCategories(categoriesId);
     }
 }
