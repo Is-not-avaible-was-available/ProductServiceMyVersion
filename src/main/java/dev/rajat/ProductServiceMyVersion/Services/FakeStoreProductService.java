@@ -5,11 +5,12 @@ import dev.rajat.ProductServiceMyVersion.DTOs.GenericProductDTO;
 import dev.rajat.ProductServiceMyVersion.Exceptions.NotFoundException;
 import dev.rajat.ProductServiceMyVersion.ThirdParty.FakeStore.FakeStoreProductClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@Primary
 @Service("fakeStoreProductService")
 public class FakeStoreProductService implements ProductService{
     private FakeStoreProductClient fakeStoreProductClient;
