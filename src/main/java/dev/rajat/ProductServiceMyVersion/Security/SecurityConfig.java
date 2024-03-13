@@ -15,12 +15,16 @@ public class SecurityConfig {
             throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/products").permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
                         .anyRequest().permitAll()
                 )
                 // Form login handles the redirect to the login page from the
                 // authorization server filter chain
-                .formLogin(Customizer.withDefaults());
+                .formLogin(Customizer.withDefaults())
+                .oauth2ResourceServer((resourceServer) -> {
+                    resourceServer.jwt(Customizer.withDefaults());
+                })
+        ;
 
         return http.build();
     }
