@@ -5,6 +5,7 @@ import dev.rajat.ProductServiceMyVersion.Exceptions.NotFoundException;
 import dev.rajat.ProductServiceMyVersion.Security.JWTData;
 import dev.rajat.ProductServiceMyVersion.Security.ValidateToken;
 import dev.rajat.ProductServiceMyVersion.Services.ProductService;
+import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
@@ -19,13 +20,15 @@ public class ProductController {
     private ProductService productService;
     private ValidateToken validateToken;
     @Autowired
-    public ProductController(@Qualifier("fakeStoreProductService") ProductService productService,
+    public ProductController(@Qualifier("selfProductService") ProductService productService,
                              ValidateToken validateToken){
         this.productService = productService;
         this.validateToken = validateToken;
    }
     @GetMapping("/{id}")
-    public GenericProductDTO getProductById(@RequestHeader(HttpHeaders.AUTHORIZATION) String authToken,
+
+    public GenericProductDTO getProductById(
+            @Nullable @RequestHeader(HttpHeaders.AUTHORIZATION) String authToken,
             @PathVariable("id") String id) throws NotFoundException {
         Optional<JWTData> jwtToken = validateToken.validateToken(authToken);
         if(jwtToken.isPresent()){

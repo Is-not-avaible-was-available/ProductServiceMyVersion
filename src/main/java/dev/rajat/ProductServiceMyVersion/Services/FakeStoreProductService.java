@@ -1,5 +1,6 @@
 package dev.rajat.ProductServiceMyVersion.Services;
 
+import dev.rajat.ProductServiceMyVersion.Config.RedisService;
 import dev.rajat.ProductServiceMyVersion.ThirdParty.FakeStore.dtos.FakeStoreDTO;
 import dev.rajat.ProductServiceMyVersion.DTOs.GenericProductDTO;
 import dev.rajat.ProductServiceMyVersion.Exceptions.NotFoundException;
@@ -10,13 +11,15 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-@Primary
+//@Primary
 @Service("fakeStoreProductService")
 public class FakeStoreProductService implements ProductService{
-    private FakeStoreProductClient fakeStoreProductClient;
+    private final FakeStoreProductClient fakeStoreProductClient;
+    private final RedisService redisService;
     @Autowired
-    public FakeStoreProductService(FakeStoreProductClient fakeStoreProductClient){
+    public FakeStoreProductService(FakeStoreProductClient fakeStoreProductClient, RedisService redisService){
         this.fakeStoreProductClient = fakeStoreProductClient;
+        this.redisService = redisService;
     }
 
     private GenericProductDTO fakeToGenericProductDTO(FakeStoreDTO fakeStoreDTO){
@@ -34,7 +37,12 @@ public class FakeStoreProductService implements ProductService{
     }
     @Override
     public GenericProductDTO getProductById(String id) throws NotFoundException {
+        GenericProductDTO genericProductDTORedisData = (GenericProductDTO) redisService.getData(id);
+        if(genericProductDTORedisData!=null){
+            return genericProductDTORedisData;
+        }
         GenericProductDTO genericProductDTO = fakeToGenericProductDTO(fakeStoreProductClient.getProductById(id));
+       redisService.setData(id, genericProductDTO);
         if(genericProductDTO == null){
             throw new NotFoundException("Not found " + id);
         }
